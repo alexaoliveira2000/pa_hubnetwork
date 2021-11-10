@@ -55,6 +55,7 @@ public class Main extends Application {
     public void start(Stage ignored) {
 
 
+
         Graph<String, String> g = build_sample_digraph();
         //Graph<String, String> g = build_flower_graph();
         System.out.println(g);
