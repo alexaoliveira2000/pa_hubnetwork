@@ -23,25 +23,21 @@
  */
 package com.brunomnsilva.smartgraph;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
-import com.brunomnsilva.smartgraph.graph.Vertex;
-import com.brunomnsilva.smartgraph.graph.Graph;
-import com.brunomnsilva.smartgraph.graph.GraphEdgeList;
+
+import com.brunomnsilva.smartgraph.graph.*;
+import com.brunomnsilva.smartgraph.graphview.*;
+import com.brunomnsilva.smartgraph.model.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 import com.brunomnsilva.smartgraph.containers.SmartGraphDemoContainer;
-import com.brunomnsilva.smartgraph.graph.Digraph;
-import com.brunomnsilva.smartgraph.graph.DigraphEdgeList;
-import com.brunomnsilva.smartgraph.graph.Edge;
-import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
-import com.brunomnsilva.smartgraph.graphview.SmartGraphVertex;
-import com.brunomnsilva.smartgraph.graphview.SmartStylableNode;
 
 /**
  *
@@ -54,29 +50,28 @@ public class Main extends Application {
     @Override
     public void start(Stage ignored) {
 
+        NetworkManager manager = new NetworkManager("dataset/sgb128");
 
+        List<Hub> hubs = manager.getHubs();
+        List<Route> routes = manager.getRoutes();
 
-        Graph<String, String> g = build_sample_digraph();
-        //Graph<String, String> g = build_flower_graph();
-        System.out.println(g);
-        
+        Graph<String, String> g = new GraphEdgeList<>();
+
+        // Create Vertices
+        Collection<Vertex<String>> vertices = new ArrayList<>();
+        for (Hub hub : hubs)
+            vertices.add(g.insertVertex(hub.getIdentifier()));
+
+        // Create Edges
+        Collection<Edge> edges = new ArrayList<>();
+        for (Route route : routes)
+            edges.add(g.insertEdge(route.getHubOrigin().getIdentifier(), route.getHubDestination().getIdentifier(), String.valueOf(route.getDistance())));
+
+        String customProps = "edge.label = true" + "\n" + "edge.arrow = false" + "\n" + "vertex.radius = 5";
+        SmartGraphProperties properties = new SmartGraphProperties(customProps);
         SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
-        SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, strategy);
+        SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, properties, strategy);
 
-        /*
-        After creating, you can change the styling of some element.
-        This can be done at any time afterwards.
-        */
-        if (g.numVertices() > 0) {
-            graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
-        }
-
-        /*
-        Basic usage:            
-        Use SmartGraphDemoContainer if you want zoom capabilities and automatic layout toggling
-        */
-        //Scene scene = new Scene(graphView, 1024, 768);
         Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
 
         Stage stage = new Stage(StageStyle.DECORATED);
@@ -86,15 +81,104 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        // Vertices coordinates
+        int k = 0;
+        for (Vertex<String> vertex : vertices) {
+            graphView.setVertexPosition(vertex, hubs.get(k).getX(), hubs.get(k).getY());
+            k++;
+        }
+
+        // ------------------------ OLD -------------------------------------------------------------
+        // Ler ficheiros
+        //FileReader fileReader = new FileReader("dataset/sgb128");
+        // Guardar informação
+        //List<Hub> hubs = fileReader.get_hub_information();
+        //int [][] routes = fileReader.get_routes();
+
+        // Mostrar hubs e routes
+        /*
+        for (Hub hub : hubs)
+            System.out.println(hub);
+        for (int i = 1; i < routes.length; i++) {
+            for (int j = 0; j < i; j++)
+                System.out.print(routes[i][j] + "\t");
+            System.out.println();
+        }
+        */
+
+        //Graph<String, String> g = build_graph(fileReader.get_hub_information(), fileReader.get_routes());
+        //Graph<String, String> g = build_sample_digraph();
+        //Graph<String, String> g = build_flower_graph();
+        //System.out.println(g);
+        /*
+        Graph<String, String> g = new GraphEdgeList<>();
+
+        // Create Vertices
+        Collection<Vertex<String>> vertices = new ArrayList<>();
+        for (Hub hub : hubs)
+            vertices.add(g.insertVertex(hub.getIdentifier()));
+
+        // Create Edges
+        for (int i = 1; i < routes.length; i++)
+            for (int j = 0; j < i; j++)
+                if (routes[i][j] != 0)
+                    g.insertEdge(hubs.get(i).getIdentifier(), hubs.get(j).getIdentifier(), String.valueOf(routes[i][j]));
+
+        /* Only Java 15 allows for multi-line strings */
+        //String customProps = "edge.label = true" + "\n" + "edge.arrow = false";
+        //SmartGraphProperties properties = new SmartGraphProperties(customProps);
+        //SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
+        //SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g,properties);
+        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
+        //SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, properties, strategy);
+        /*
+        Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
+
+        Stage stage = new Stage(StageStyle.DECORATED);
+        stage.setTitle("JavaFX SmartGraph Visualization");
+        stage.setMinHeight(500);
+        stage.setMinWidth(800);
+        stage.setScene(scene);
+        stage.show();
+        */
         /*
         IMPORTANT: Must call init() after scene is displayed so we can have width and height values
         to initially place the vertices according to the placement strategy
         */
+        /*
         graphView.init();
+
+        // Vertices coordinates
+        int k = 0;
+        for (Vertex<String> vertex : vertices) {
+            graphView.setVertexPosition(vertex, hubs.get(k).getX(), hubs.get(k).getY());
+            k++;
+        }
+
+        */
+
+        /*
+        After creating, you can change the styling of some element.
+        This can be done at any time afterwards.
+        */
+
+        //graphView.getStylableEdge("0").setStyle("-fx-fill: purple; -fx-stroke: purple;");
+
+        //if (g.numVertices() > 0) {
+        //    graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
+        //}
+
+        /*
+        Basic usage:            
+        Use SmartGraphDemoContainer if you want zoom capabilities and automatic layout toggling
+        */
+        //Scene scene = new Scene(graphView, 1024, 768);
+
 
         /*
         Bellow you can see how to attach actions for when vertices and edges are double clicked
-         */        
+         */
+        /*
         graphView.setVertexDoubleClickAction((SmartGraphVertex<String> graphVertex) -> {
             System.out.println("Vertex contains element: " + graphVertex.getUnderlyingVertex().element());
                       
@@ -102,16 +186,18 @@ public class Main extends Application {
             if( !graphVertex.removeStyleClass("myVertex") ) {
                 /* for the golden vertex, this is necessary to clear the inline
                 css class. Otherwise, it has priority. Test and uncomment. */
-                //graphVertex.setStyle(null);
-                
-                graphVertex.addStyleClass("myVertex");
-            }
-            
-            //want fun? uncomment below with automatic layout
-            //g.removeVertex(graphVertex.getUnderlyingVertex());
-            //graphView.update();
-        });
+        //graphVertex.setStyle(null);
 
+        //graphVertex.addStyleClass("myVertex");
+            //}
+
+    //want fun? uncomment below with automatic layout
+    //g.removeVertex(graphVertex.getUnderlyingVertex());
+    //graphView.update();
+    //});
+
+
+        /*
         graphView.setEdgeDoubleClickAction(graphEdge -> {
             System.out.println("Edge contains element: " + graphEdge.getUnderlyingEdge().element());
             //dynamically change the style when clicked
@@ -124,21 +210,23 @@ public class Main extends Application {
             //g.removeEdge(underlyingEdge);
             //graphView.update();
         });
+        */
+
 
         /*
         Should proceed with automatic layout or keep original placement?
         If using SmartGraphDemoContainer you can toggle this in the UI 
          */
-        //graphView.setAutomaticLayout(true);
+    //graphView.setAutomaticLayout(true);
 
         /* 
         Uncomment lines to test adding of new elements
          */
-        //continuously_test_adding_elements(g, graphView);
-        //stage.setOnCloseRequest(event -> {
-        //    running = false;
-        //});
-    }
+    //continuously_test_adding_elements(g, graphView);
+    //stage.setOnCloseRequest(event -> {
+    //    running = false;
+    //});
+}
 
     /**
      * @param args the command line arguments
