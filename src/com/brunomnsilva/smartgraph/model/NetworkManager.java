@@ -50,7 +50,6 @@ public class NetworkManager {
 
     // Returns a Map of all the Hubs (Key) and their corresponding adjacency (Value)
     public Map<Hub,Integer> hubCentrality() {
-
         Map<Hub,Integer> map = new HashMap<>();
         for(Hub elem: getHubs())
             map.put(elem,countNeighbors(elem));
@@ -71,10 +70,14 @@ public class NetworkManager {
         return getNeighbors(hub).size();
     }
 
-    // NOT IMPLEMENTED
     // Returns the 5 top Hubs with the most adjacency (from method hubCentrality()), on descending order
     public List<Hub> top5CentralHubs() {
-        return null;
+        List<Hub> list = new ArrayList<>();
+        List<Map.Entry<Hub,Integer>> entriesList = new ArrayList<>(hubCentrality().entrySet());
+        entriesList.sort(Map.Entry.comparingByValue());
+        for (int i = entriesList.size() - 1; i > entriesList.size() - 6; i--)
+            list.add(entriesList.get(i).getKey());
+        return list;
     }
 
     // Returns a boolean value if a given Hub is isolated
