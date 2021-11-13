@@ -68,10 +68,8 @@ public class Main extends Application {
         System.out.println("No. of neighbors:\t" + manager.countNeighbors(city));
         System.out.println("Neighbors:\t\t\t" + manager.getNeighbors(city));
 
-        manager.hubCentrality();
-
-
-        System.out.println();
+        System.out.println("DFS - "+ manager.depthFirstSearch(manager.getHub("Washington, DC")));
+        System.out.println("BFS - "+ manager.breadthFirstSearch(manager.getHub("Washington, DC")));
 
         Graph<Hub, Route> graph = new GraphEdgeList<>();
 
