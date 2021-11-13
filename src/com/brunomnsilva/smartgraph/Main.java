@@ -23,8 +23,6 @@
  */
 package com.brunomnsilva.smartgraph;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,10 +31,7 @@ import com.brunomnsilva.smartgraph.graph.*;
 import com.brunomnsilva.smartgraph.graphview.*;
 import com.brunomnsilva.smartgraph.model.*;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import com.brunomnsilva.smartgraph.containers.SmartGraphDemoContainer;
 
 /**
  *
@@ -49,55 +44,8 @@ public class Main extends Application {
     @Override
     public void start(Stage ignored) {
 
-        NetworkManager manager = new NetworkManager("dataset/sgb32", "routes_1.txt");
-
-        List<Hub> hubs = manager.getHubs();
-        List<Route> routes = manager.getRoutes();
-
-        //manager.saveRoutes("saved_routes");
-
-        System.out.println("Número de hubs na rede: " + manager.countHubs());
-        System.out.println("Número de rotas na rede: " + manager.countRoutes());
-
-        System.out.println();
-
-        Hub city = manager.getHub("Weed, CA");
-        System.out.println("Informations about " + city + ":");
-
-        System.out.println("Isolated?\t\t\t" + manager.isIsolated(city));
-        System.out.println("No. of neighbors:\t" + manager.countNeighbors(city));
-        System.out.println("Neighbors:\t\t\t" + manager.getNeighbors(city));
-
-        System.out.println("DFS - "+ manager.depthFirstSearch(manager.getHub("Washington, DC")));
-        System.out.println("BFS - "+ manager.breadthFirstSearch(manager.getHub("Washington, DC")));
-
-        Graph<Hub, Route> graph = new GraphEdgeList<>();
-
-        // Create Vertices
-        List<Vertex> vertices = new ArrayList<>();
-        for (Hub hub : hubs)
-            vertices.add(graph.insertVertex(hub));
-
-        // Create Edges
-        List<Edge> edges = new ArrayList<>();
-        for (Route route : routes)
-            edges.add(graph.insertEdge(route.getHubOrigin(), route.getHubDestination(), route));
-
-        SmartGraphPanel<Hub, Route> graphView = new SmartGraphPanel<>(graph, new SmartCircularSortedPlacementStrategy());
-
-        // Vertices coordinates
-        for (int i = 0; i < vertices.size(); i++)
-            graphView.setVertexPosition(vertices.get(i), hubs.get(i).getX(), hubs.get(i).getY());
-
-        Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
-        Stage stage = new Stage(StageStyle.DECORATED);
-        stage.setTitle("JavaFX SmartGraph Visualization");
-        stage.setMinHeight(500);
-        stage.setMinWidth(800);
-        stage.setScene(scene);
-        stage.show();
-
-
+        NetworkController controller = new NetworkController("dataset/sgb128", "routes_2.txt");
+        controller.createStage();
 
         // ------------------------ OLD -------------------------------------------------------------
         // Ler ficheiros

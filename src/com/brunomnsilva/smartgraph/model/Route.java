@@ -6,12 +6,6 @@ public class Route {
     private Hub origin;
     private Hub destination;
 
-    public Route(Hub origin, Hub destination) {
-        this.distance = 0;
-        this.origin = origin;
-        this.destination = destination;
-    }
-
     public Route(Hub origin, Hub destination, int distance) {
         this.distance = distance;
         this.origin = origin;

@@ -3,6 +3,8 @@ package com.brunomnsilva.smartgraph.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class FileWriter {
@@ -24,26 +26,19 @@ public class FileWriter {
     }
 
     // Saves a file in a given folder
-    public void saveFile(String folderName) {
+    public String saveFile(String folderName) {
         File folder = new File("dataset/" + folderName);
-        File[] listOfFiles = folder.listFiles();
-        int lastSave;
-        if (listOfFiles == null || listOfFiles.length == 0)
-            lastSave = -1;
-        else {
-            List<Integer> files = new ArrayList<>();
-            for (File file : listOfFiles)
-                files.add(Integer.valueOf(file.getName().substring(folderName.length() + 1, file.getName().indexOf(".txt"))));
-            Collections.reverse(files);
-            lastSave = files.get(0);
-        }
+        SimpleDateFormat sdf1 = new SimpleDateFormat("ddMMyyyy_HHmmss");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String fileName = "dataset/" + folderName + "/" + folderName + "_" + sdf1.format(timestamp) + ".txt";
         try {
-            PrintWriter out = new PrintWriter("dataset/" + folderName + "/" + folderName + "_" + String.valueOf(lastSave + 1) + ".txt");
+            PrintWriter out = new PrintWriter(fileName);
             for (String line : this.file)
                 out.println(line);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return fileName;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.brunomnsilva.smartgraph.model;
 
 import com.brunomnsilva.smartgraph.graph.Edge;
+import com.brunomnsilva.smartgraph.graph.Graph;
+import com.brunomnsilva.smartgraph.graph.InvalidEdgeException;
 import com.brunomnsilva.smartgraph.graph.Vertex;
 
 import java.util.*;
@@ -14,38 +16,81 @@ public class NetworkManager {
         readFolder(folder, routes_file);
     }
 
+    public NetworkManager(String path) {
+        String folder = path.substring(0,path.lastIndexOf("/"));
+        String routes_file = path.substring(path.lastIndexOf("/") + 1);
+        readFolder(folder, routes_file);
+    }
+
+    // Populate list of hubs and routes
     private void readFolder(String folder, String routes_file) {
         FileReader fileReader = new FileReader(folder, routes_file);
         hubs = fileReader.readHubs();
         routes = fileReader.readRoutes(hubs);
     }
 
+    // Returns a list of all the hubs
     public List<Hub> getHubs() {
         return this.hubs;
     }
 
+    // Returns a list of all the routes
     public List<Route> getRoutes() {
         return this.routes;
     }
 
+    // Returns a count of all the hubs
     public int countHubs() {
         return getHubs().size();
     }
 
+    // Returns a count of all the routes
     public int countRoutes() {
         return getRoutes().size();
     }
 
+    // Clears the hubs list
+    public void clearHubs() {
+        this.hubs.clear();
+    }
+
+    // Clears the routes list
+    public void clearRoutes() {
+        this.routes.clear();
+    }
+
     // NOT IMPLEMENTED
     // Add a given Hub to the graph
-    public Vertex<Hub> insertHub(Hub hub) {
+    public Vertex<Hub> insertHub(Graph graph, List<Vertex<Hub>> vertices, Hub newHub) throws ExistingHubException {
         return null;
     }
 
     // NOT IMPLEMENTED
-    // Add a given Route to the graph
-    public Edge insertRoute(Route route) {
+    // Remove a given hub from the graph
+    public Vertex<Hub> removeHub(Graph graph, List<Vertex<Hub>> vertices, Hub hub) throws NonExistingHubException {
         return null;
+    }
+
+    // Add a given Route to the graph
+    public Edge insertRoute(Graph graph, List<Edge<Route,Hub>> edges, Route newRoute) throws ExistingRouteException {
+        // Validation: this Route already exists
+        for (Route route : getRoutes())
+            if (route.containsHub(newRoute.getHubOrigin()) && route.containsHub(newRoute.getHubDestination()))
+                throw new ExistingRouteException();
+            this.routes.add(newRoute);
+        Edge<Route,Hub> edge = graph.insertEdge(newRoute.getHubOrigin(),newRoute.getHubDestination(),newRoute);
+            edges.add(edge);
+        return edge;
+    }
+
+    // Remove a given Route from the graph
+    public Edge removeRoute(Graph graph, List<Edge<Route,Hub>> edges, Route route) throws NonExistingRouteException {
+        // Validation: this Route doesn't exists
+        if (route == null) throw new NonExistingRouteException();
+        int routeIndex = this.routes.indexOf(route);
+        this.routes.remove(route);
+        graph.removeEdge(edges.get(routeIndex));
+        return edges.remove(routeIndex);
     }
 
     // Returns a Map of all the Hubs (Key) and their corresponding adjacency (Value)
@@ -147,54 +192,61 @@ public class NetworkManager {
         return null;
     }
 
-    // NOT IMPLEMENTED
     // Returns a collection of all the visited Hubs, by breadth first order, starting at a root Hub
     public List<Hub> breadthFirstSearch(Hub root) {
-        HashSet<Hub> visited = new HashSet<>();
+        Set<Hub> visited = new HashSet<>();
         Queue<Hub> queue = new LinkedList<>();
-        ArrayList<Hub> list = new ArrayList<>();
+        List<Hub> list = new ArrayList<>();
         visited.add(root);
         queue.add(root);
         while(!queue.isEmpty()){
             Hub v = queue.remove();
             list.add(v);
-            for(Hub elem : getNeighbors(v)){
-
+            for(Hub elem : getNeighbors(v))
                 if(!visited.contains(elem)){
                     queue.add(elem);
                     visited.add(elem);
                 }
-            }
         }
         return list;
     }
 
-    // NOT IMPLEMENTED
     // Returns a collection of all the visited Hubs, by depth first order, starting at a root Hub
     public List<Hub> depthFirstSearch(Hub root) {
-
-        HashSet<Hub> visited = new HashSet<>();
+        Set<Hub> visited = new HashSet<>();
         Stack<Hub> stack = new Stack<>();
-        ArrayList<Hub> list = new ArrayList<>();
+        List<Hub> list = new ArrayList<>();
         visited.add(root);
         stack.add(root);
         while(!stack.isEmpty()){
             Hub v = stack.pop();
             list.add(v);
-            for(Hub elem : getNeighbors(v)){
+            for(Hub elem : getNeighbors(v))
                 if(!visited.contains(elem)){
                     stack.add(elem);
                     visited.add(elem);
                 }
-            }
         }
         return list;
     }
 
-    public void saveRoutes(String folderName) {
+    // Saves a file in a specified folder with all the current routes, returns the generated file name
+    public String saveRoutes(String folderName) {
         FileWriter fileWriter = new FileWriter();
         fileWriter.matrixToList(getRoutesMatrix());
-        fileWriter.saveFile(folderName);
+        return fileWriter.saveFile(folderName);
+    }
+
+    // Returns the number of the graph components
+    public int components() {
+        int components = 0;
+        List<Hub> visitedHubs = new ArrayList<>();
+        for (Hub hub : getHubs())
+            if (!visitedHubs.contains(hub)) {
+                components++;
+                visitedHubs.addAll(breadthFirstSearch(hub));
+            }
+        return components;
     }
 
     // Returns a matrix with all current available routes
