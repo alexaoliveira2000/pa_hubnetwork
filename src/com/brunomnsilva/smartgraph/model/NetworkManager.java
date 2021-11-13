@@ -150,13 +150,45 @@ public class NetworkManager {
     // NOT IMPLEMENTED
     // Returns a collection of all the visited Hubs, by breadth first order, starting at a root Hub
     public List<Hub> breadthFirstSearch(Hub root) {
-        return null;
+        HashSet<Hub> visited = new HashSet<>();
+        Queue<Hub> queue = new LinkedList<>();
+        ArrayList<Hub> list = new ArrayList<>();
+        visited.add(root);
+        queue.add(root);
+        while(!queue.isEmpty()){
+            Hub v = queue.remove();
+            list.add(v);
+            for(Hub elem : getNeighbors(v)){
+
+                if(!visited.contains(elem)){
+                    queue.add(elem);
+                    visited.add(elem);
+                }
+            }
+        }
+        return list;
     }
 
     // NOT IMPLEMENTED
     // Returns a collection of all the visited Hubs, by depth first order, starting at a root Hub
     public List<Hub> depthFirstSearch(Hub root) {
-        return null;
+
+        HashSet<Hub> visited = new HashSet<>();
+        Stack<Hub> stack = new Stack<>();
+        ArrayList<Hub> list = new ArrayList<>();
+        visited.add(root);
+        stack.add(root);
+        while(!stack.isEmpty()){
+            Hub v = stack.pop();
+            list.add(v);
+            for(Hub elem : getNeighbors(v)){
+                if(!visited.contains(elem)){
+                    stack.add(elem);
+                    visited.add(elem);
+                }
+            }
+        }
+        return list;
     }
 
     public void saveRoutes(String folderName) {
