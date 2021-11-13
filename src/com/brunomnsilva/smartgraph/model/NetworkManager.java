@@ -3,9 +3,7 @@ package com.brunomnsilva.smartgraph.model;
 import com.brunomnsilva.smartgraph.graph.Edge;
 import com.brunomnsilva.smartgraph.graph.Vertex;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetworkManager {
 
@@ -50,10 +48,13 @@ public class NetworkManager {
         return null;
     }
 
-    // NOT IMPLEMENTED
     // Returns a Map of all the Hubs (Key) and their corresponding adjacency (Value)
     public Map<Hub,Integer> hubCentrality() {
-        return null;
+
+        Map<Hub,Integer> map = new HashMap<>();
+        for(Hub elem: getHubs())
+            map.put(elem,countNeighbors(elem));
+        return map;
     }
 
     // Returns a list of all the neighboring hubs from a given Hub

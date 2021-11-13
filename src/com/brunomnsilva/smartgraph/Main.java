@@ -68,6 +68,9 @@ public class Main extends Application {
         System.out.println("No. of neighbors:\t" + manager.countNeighbors(city));
         System.out.println("Neighbors:\t\t\t" + manager.getNeighbors(city));
 
+        manager.hubCentrality();
+
+
         System.out.println();
 
         Graph<Hub, Route> graph = new GraphEdgeList<>();
@@ -95,6 +98,8 @@ public class Main extends Application {
         stage.setMinWidth(800);
         stage.setScene(scene);
         stage.show();
+
+
 
         // ------------------------ OLD -------------------------------------------------------------
         // Ler ficheiros
