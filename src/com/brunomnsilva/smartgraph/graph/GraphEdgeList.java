@@ -169,11 +169,10 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
     public synchronized Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement) 
             throws InvalidVertexException, InvalidEdgeException {
 
-        /*
         if (existsEdgeWith(edgeElement)) {
             throw new InvalidEdgeException("There's already an edge with this element.");
         }
-        */
+
         if (!existsVertexWith(vElement1)) {
             throw new InvalidVertexException("No vertex contains " + vElement1);
         }

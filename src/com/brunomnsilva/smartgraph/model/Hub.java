@@ -27,13 +27,7 @@ public class Hub {
 
     @Override
     public String toString() {
-        return "Hub{" +
-                "code='" + code + '\'' +
-                ", name='" + name + '\'' +
-                ", population=" + population +
-                ", x=" + x +
-                ", y=" + y +
-                '}';
+        return getIdentifier();
     }
 
     public String getCode() {

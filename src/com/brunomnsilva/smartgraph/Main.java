@@ -24,7 +24,6 @@
 package com.brunomnsilva.smartgraph;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -50,43 +49,52 @@ public class Main extends Application {
     @Override
     public void start(Stage ignored) {
 
-        NetworkManager manager = new NetworkManager("dataset/sgb128");
+        NetworkManager manager = new NetworkManager("dataset/sgb32", "routes_1.txt");
 
         List<Hub> hubs = manager.getHubs();
         List<Route> routes = manager.getRoutes();
 
-        Graph<String, String> g = new GraphEdgeList<>();
+        //manager.saveRoutes("saved_routes");
+
+        System.out.println("Número de hubs na rede: " + manager.countHubs());
+        System.out.println("Número de rotas na rede: " + manager.countRoutes());
+
+        System.out.println();
+
+        Hub city = manager.getHub("Weed, CA");
+        System.out.println("Informations about " + city + ":");
+
+        System.out.println("Isolated?\t\t\t" + manager.isIsolated(city));
+        System.out.println("No. of neighbors:\t" + manager.countNeighbors(city));
+        System.out.println("Neighbors:\t\t\t" + manager.getNeighbors(city));
+
+        System.out.println();
+
+        Graph<Hub, Route> graph = new GraphEdgeList<>();
 
         // Create Vertices
-        Collection<Vertex<String>> vertices = new ArrayList<>();
+        List<Vertex> vertices = new ArrayList<>();
         for (Hub hub : hubs)
-            vertices.add(g.insertVertex(hub.getIdentifier()));
+            vertices.add(graph.insertVertex(hub));
 
         // Create Edges
-        Collection<Edge> edges = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
         for (Route route : routes)
-            edges.add(g.insertEdge(route.getHubOrigin().getIdentifier(), route.getHubDestination().getIdentifier(), String.valueOf(route.getDistance())));
+            edges.add(graph.insertEdge(route.getHubOrigin(), route.getHubDestination(), route));
 
-        String customProps = "edge.label = true" + "\n" + "edge.arrow = false" + "\n" + "vertex.radius = 5";
-        SmartGraphProperties properties = new SmartGraphProperties(customProps);
-        SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-        SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, properties, strategy);
+        SmartGraphPanel<Hub, Route> graphView = new SmartGraphPanel<>(graph, new SmartCircularSortedPlacementStrategy());
+
+        // Vertices coordinates
+        for (int i = 0; i < vertices.size(); i++)
+            graphView.setVertexPosition(vertices.get(i), hubs.get(i).getX(), hubs.get(i).getY());
 
         Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
-
         Stage stage = new Stage(StageStyle.DECORATED);
         stage.setTitle("JavaFX SmartGraph Visualization");
         stage.setMinHeight(500);
         stage.setMinWidth(800);
         stage.setScene(scene);
         stage.show();
-
-        // Vertices coordinates
-        int k = 0;
-        for (Vertex<String> vertex : vertices) {
-            graphView.setVertexPosition(vertex, hubs.get(k).getX(), hubs.get(k).getY());
-            k++;
-        }
 
         // ------------------------ OLD -------------------------------------------------------------
         // Ler ficheiros

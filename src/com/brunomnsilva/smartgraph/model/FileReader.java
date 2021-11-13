@@ -10,9 +10,11 @@ import java.util.Scanner;
 public class FileReader {
 
     private String folder;
+    private String routes_file;
 
-    public FileReader(String folder) {
+    public FileReader(String folder, String routes_file) {
         this.folder = folder;
+        this.routes_file = routes_file;
     }
 
     // Returns a list of Hubs with all the information
@@ -78,7 +80,7 @@ public class FileReader {
         List<Route> routes = new ArrayList<>();
         int row_index = 0;
         int column_index = 0;
-        for (String row : readFile("/routes_1.txt")) {
+        for (String row : readFile(this.routes_file)) {
             column_index = 0;
             for (String value : row.split(" ")) {
                 if (Integer.valueOf(value) != 0 && row_index < column_index)

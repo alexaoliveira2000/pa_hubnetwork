@@ -30,4 +30,20 @@ public class Route {
         return this.distance;
     }
 
+    // Returns the opposite Hub
+    public Hub opposite(Hub hub) {
+        if (hub.equals(getHubOrigin())) return getHubDestination();
+        if (hub.equals(getHubDestination())) return getHubOrigin();
+        return null;
+    }
+
+    // Returns a boolean value, if a given Hub is part of this Route
+    public boolean containsHub(Hub hub) {
+        return getHubOrigin().equals(hub) || getHubDestination().equals(hub);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getDistance());
+    }
 }
