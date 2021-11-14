@@ -76,15 +76,16 @@ public class FileReader {
     }
 
     // Reads routes_*.txt file, creates new Routes, returns new list of Routes
-    public List<Route> readRoutes(List<Hub> hubs) {
+    public List<Route> readRoutes(List<Hub> hubs) throws NonEqualHubsException {
+        if (readFile(this.routes_file).size() != hubs.size()) throw new NonEqualHubsException();
         List<Route> routes = new ArrayList<>();
         int row_index = 0;
         int column_index = 0;
         for (String row : readFile(this.routes_file)) {
             column_index = 0;
             for (String value : row.split(" ")) {
-                if (Integer.valueOf(value) != 0 && row_index < column_index)
-                    routes.add(new Route(hubs.get(row_index),hubs.get(column_index),Integer.valueOf(value)));
+                if (row_index < column_index && Integer.valueOf(value) != 0)
+                    routes.add(new Route(hubs.get(row_index), hubs.get(column_index), Integer.valueOf(value)));
                 column_index++;
             }
             row_index++;

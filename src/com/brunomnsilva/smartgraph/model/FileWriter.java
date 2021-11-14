@@ -21,20 +21,21 @@ public class FileWriter {
             String row = "";
             for (int j = 0; j < matrix.length; j++)
                 row = row + " " + matrix[i][j];
-            file.add(row);
+            file.add(row.trim());
         }
     }
 
     // Saves a file in a given folder
     public String saveFile(String folderName) {
-        File folder = new File("dataset/" + folderName);
         SimpleDateFormat sdf1 = new SimpleDateFormat("ddMMyyyy_HHmmss");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String fileName = "dataset/" + folderName + "/" + folderName + "_" + sdf1.format(timestamp) + ".txt";
+        int counter = 0;
         try {
             PrintWriter out = new PrintWriter(fileName);
             for (String line : this.file)
                 out.println(line);
+            out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

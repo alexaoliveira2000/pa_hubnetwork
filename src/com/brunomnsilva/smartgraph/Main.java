@@ -44,62 +44,11 @@ public class Main extends Application {
     @Override
     public void start(Stage ignored) {
 
-        NetworkController controller = new NetworkController("dataset/sgb128", "routes_2.txt");
-        controller.createStage();
+        NetworkController controller = new NetworkController("dataset/sgb128", "routes_1.txt");
+        controller.start();
 
         // ------------------------ OLD -------------------------------------------------------------
-        // Ler ficheiros
-        //FileReader fileReader = new FileReader("dataset/sgb128");
-        // Guardar informação
-        //List<Hub> hubs = fileReader.get_hub_information();
-        //int [][] routes = fileReader.get_routes();
 
-        // Mostrar hubs e routes
-        /*
-        for (Hub hub : hubs)
-            System.out.println(hub);
-        for (int i = 1; i < routes.length; i++) {
-            for (int j = 0; j < i; j++)
-                System.out.print(routes[i][j] + "\t");
-            System.out.println();
-        }
-        */
-
-        //Graph<String, String> g = build_graph(fileReader.get_hub_information(), fileReader.get_routes());
-        //Graph<String, String> g = build_sample_digraph();
-        //Graph<String, String> g = build_flower_graph();
-        //System.out.println(g);
-        /*
-        Graph<String, String> g = new GraphEdgeList<>();
-
-        // Create Vertices
-        Collection<Vertex<String>> vertices = new ArrayList<>();
-        for (Hub hub : hubs)
-            vertices.add(g.insertVertex(hub.getIdentifier()));
-
-        // Create Edges
-        for (int i = 1; i < routes.length; i++)
-            for (int j = 0; j < i; j++)
-                if (routes[i][j] != 0)
-                    g.insertEdge(hubs.get(i).getIdentifier(), hubs.get(j).getIdentifier(), String.valueOf(routes[i][j]));
-
-        /* Only Java 15 allows for multi-line strings */
-        //String customProps = "edge.label = true" + "\n" + "edge.arrow = false";
-        //SmartGraphProperties properties = new SmartGraphProperties(customProps);
-        //SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-        //SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g,properties);
-        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
-        //SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, properties, strategy);
-        /*
-        Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
-
-        Stage stage = new Stage(StageStyle.DECORATED);
-        stage.setTitle("JavaFX SmartGraph Visualization");
-        stage.setMinHeight(500);
-        stage.setMinWidth(800);
-        stage.setScene(scene);
-        stage.show();
-        */
         /*
         IMPORTANT: Must call init() after scene is displayed so we can have width and height values
         to initially place the vertices according to the placement strategy

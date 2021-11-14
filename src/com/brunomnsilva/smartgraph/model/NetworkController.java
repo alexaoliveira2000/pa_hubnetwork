@@ -28,17 +28,37 @@ public class NetworkController {
     SmartGraphPanel<Hub, Route> graphView;
     Stage stage;
 
+    // Initialize the Controller giving it a folder (dataset) and the specific routes_file
     public NetworkController(String folder, String routes_file) {
-        this.manager = new NetworkManager(folder, routes_file);
+        this.stage = new Stage(StageStyle.DECORATED);
+        initializeController(folder + "/" + routes_file);
+    }
+
+    // Initialize the Controller giving it the specific routes_file path
+    public NetworkController(String path) {
+        this.stage = new Stage(StageStyle.DECORATED);
+        initializeController(path);
+    }
+
+    // Method called on starting the application, or when a file is imported
+    private void initializeController(String path) throws NonEqualHubsException {
+        String folder = path.substring(0,path.lastIndexOf("/"));
+        String routes_file = path.substring(path.lastIndexOf("/") + 1);
+        if (this.manager != null) {
+            this.manager = new NetworkManager(path, this.manager.getHubs());
+            if (this.vertices != null && this.manager.countHubs() != this.vertices.size())
+                throw new NonEqualHubsException();
+        } else {
+            this.manager = new NetworkManager(folder, routes_file);
+        }
         this.graph = new GraphEdgeList<>();
         this.vertices = createVertices(graph);
         this.edges = createEdges(graph);
         this.graphView = new SmartGraphPanel<>(graph);
-        this.stage = new Stage(StageStyle.DECORATED);
     }
 
     // Create all the elements of the stage and run program
-    public void createStage() {
+    public void start() {
 
         // Horizontal tab with the buttons: "Add Hub" | "Add Route" | "Save Routes"
         Pane tab = new HBox();
@@ -91,7 +111,6 @@ public class NetworkController {
         List<Edge<Route,Hub>> list = new ArrayList<>();
         for (Route route : manager.getRoutes())
             list.add(graph.insertEdge(route.getHubOrigin(), route.getHubDestination(), route));
-            //list.add(graph.insertEdge(route.getHubOrigin(), route.getHubDestination(), route));
         return list;
     }
 
@@ -148,22 +167,37 @@ public class NetworkController {
                         createButton.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent e) {
-                                try {
-                                    manager.insertRoute(
-                                            graph,
-                                            edges,
-                                            new Route(
-                                                    manager.getHub(originHubTextField.getText()),
-                                                    manager.getHub(destinationHubTextField.getText()),
-                                                    Integer.valueOf(distanceTextField.getText()))
-                                    );
-                                    //graphView.get
-                                    //graphView.getStylableEdge(edge.element()).setStyle("-fx-fill: green; -fx-stroke: green;");
-                                    graphView.update();
-                                    dialog.close();
-                                } catch(ExistingRouteException exception) {
-                                    // Mostrar texto a dizer que já existe
-                                    System.out.println(exception.getMessage());
+                                // Validations
+                                if (originHubTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Origin Hub\" field is empty!");
+                                else if (destinationHubTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Destination Hub\" field is empty!");
+                                else if (distanceTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Distance\" field is empty!");
+                                else if (manager.getHub(originHubTextField.getText()) == null)
+                                    System.out.println("\"Origin Hub\" doesn't exist!");
+                                else if (manager.getHub(destinationHubTextField.getText()) == null)
+                                    System.out.println("\"Destination Hub\" doesn't exist!");
+                                else if (Integer.valueOf(distanceTextField.getText()) <= 0)
+                                    System.out.println("\"Distance\" should be greater than 0!");
+                                else {
+                                    try {
+                                        manager.insertRoute(
+                                                graph,
+                                                edges,
+                                                new Route(
+                                                        manager.getHub(originHubTextField.getText()),
+                                                        manager.getHub(destinationHubTextField.getText()),
+                                                        Integer.valueOf(distanceTextField.getText()))
+                                        );
+                                        graphView.updateAndWait();
+                                        graphView.getStylableEdge(edges.get(edges.size() - 1)).setStyle("-fx-fill: green; -fx-stroke: green;");
+                                        dialog.close();
+                                        System.out.println("Route created!");
+                                    } catch (ExistingRouteException exception) {
+                                        // Mostrar texto a dizer que já existe
+                                        System.out.println(exception.getMessage());
+                                    }
                                 }
                             }
                         });
@@ -196,19 +230,30 @@ public class NetworkController {
                         removeButton.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent e) {
-                                try {
-                                    manager.removeRoute(
-                                            graph,
-                                            edges,
-                                            manager.getRoute(
-                                                    manager.getHub(originHubTextField.getText()),
-                                                    manager.getHub(destinationHubTextField.getText()))
-                                    );
-                                    graphView.update();
-                                    dialog.close();
-                                } catch(NonExistingRouteException exception) {
-                                    // Mostrar texto a dizer que não existe
-                                    System.out.println(exception.getMessage());
+                                // Validations
+                                if (originHubTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Origin Hub\" field is empty!");
+                                else if (destinationHubTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Destination Hub\" field is empty!");
+                                else if (manager.getHub(originHubTextField.getText()) == null)
+                                    System.out.println("\"Origin Hub\" doesn't exist!");
+                                else if (manager.getHub(destinationHubTextField.getText()) == null)
+                                    System.out.println("\"Destination Hub\" doesn't exist!");
+                                else {
+                                    try {
+                                        manager.removeRoute(
+                                                graph,
+                                                edges,
+                                                manager.getRoute(
+                                                        manager.getHub(originHubTextField.getText()),
+                                                        manager.getHub(destinationHubTextField.getText()))
+                                        );
+                                        graphView.updateAndWait();
+                                        dialog.close();
+                                    } catch (NonExistingRouteException exception) {
+                                        // Mostrar texto a dizer que não existe
+                                        System.out.println(exception.getMessage());
+                                    }
                                 }
                             }
                         });
@@ -239,7 +284,7 @@ public class NetworkController {
                         dialog.initOwner(stage);
                         VBox dialogVbox = new VBox(20);
 
-                        TextField originHubTextField = createField(dialogVbox, "Routes file:");
+                        TextField routesFileTextField = createField(dialogVbox, "Routes File:");
                         Button importButton = new Button("Import File");
 
                         dialogVbox.getChildren().add(importButton);
@@ -251,14 +296,19 @@ public class NetworkController {
                         importButton.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent e) {
-                                manager = new NetworkManager(originHubTextField.getText());
-                                graph = new GraphEdgeList<>();
-                                vertices = createVertices(graph);
-                                edges = createEdges(graph);
-                                graphView = new SmartGraphPanel<>(graph);
-                                createStage();
-                                graphView.update();
-                                dialog.close();
+                                if (routesFileTextField.getText().trim().isEmpty())
+                                    System.out.println("\"Routes File\" field is empty!");
+                                else {
+                                    try {
+                                        initializeController(routesFileTextField.getText());
+                                        start();
+                                        graphView.update();
+                                        dialog.close();
+                                    } catch(NonEqualHubsException exception) {
+                                        // Mostrar texto a dizer que não existe
+                                        System.out.println(exception.getMessage());
+                                    }
+                                }
                             }
                         });
                     }

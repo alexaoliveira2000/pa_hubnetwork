@@ -12,21 +12,25 @@ public class NetworkManager {
     private List<Hub> hubs;
     private List<Route> routes;
 
+    // If two arguments are received, read hubs and routes files
     public NetworkManager(String folder, String routes_file) {
         readFolder(folder, routes_file);
     }
 
-    public NetworkManager(String path) {
-        String folder = path.substring(0,path.lastIndexOf("/"));
-        String routes_file = path.substring(path.lastIndexOf("/") + 1);
-        readFolder(folder, routes_file);
+    // If hubs information is already received, read only routes file (used for routes file imports)
+    public NetworkManager(String routes_file, List<Hub> hubs) throws NonEqualHubsException {
+        String folder = routes_file.substring(0,routes_file.lastIndexOf("/"));
+        String route_file = routes_file.substring(routes_file.lastIndexOf("/") + 1);
+        FileReader fileReader = new FileReader(folder, route_file);
+        this.hubs = hubs;
+        this.routes = fileReader.readRoutes(this.hubs);
     }
 
     // Populate list of hubs and routes
     private void readFolder(String folder, String routes_file) {
         FileReader fileReader = new FileReader(folder, routes_file);
-        hubs = fileReader.readHubs();
-        routes = fileReader.readRoutes(hubs);
+        this.hubs = fileReader.readHubs();
+        this.routes = fileReader.readRoutes(this.hubs);
     }
 
     // Returns a list of all the hubs
@@ -71,20 +75,20 @@ public class NetworkManager {
         return null;
     }
 
-    // Add a given Route to the graph
-    public Edge insertRoute(Graph graph, List<Edge<Route,Hub>> edges, Route newRoute) throws ExistingRouteException {
+    // Add a given Route to the graph, returns the created Route
+    public Edge<Route,Hub> insertRoute(Graph graph, List<Edge<Route,Hub>> edges, Route newRoute) throws ExistingRouteException {
         // Validation: this Route already exists
         for (Route route : getRoutes())
             if (route.containsHub(newRoute.getHubOrigin()) && route.containsHub(newRoute.getHubDestination()))
                 throw new ExistingRouteException();
             this.routes.add(newRoute);
         Edge<Route,Hub> edge = graph.insertEdge(newRoute.getHubOrigin(),newRoute.getHubDestination(),newRoute);
-            edges.add(edge);
+        edges.add(edge);
         return edge;
     }
 
-    // Remove a given Route from the graph
-    public Edge removeRoute(Graph graph, List<Edge<Route,Hub>> edges, Route route) throws NonExistingRouteException {
+    // Remove a given Route from the graph, returns the removed Route
+    public Edge<Route,Hub> removeRoute(Graph graph, List<Edge<Route,Hub>> edges, Route route) throws NonExistingRouteException {
         // Validation: this Route doesn't exists
         if (route == null) throw new NonExistingRouteException();
         int routeIndex = this.routes.indexOf(route);
