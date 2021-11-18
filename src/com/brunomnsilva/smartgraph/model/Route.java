@@ -40,4 +40,9 @@ public class Route {
     public String toString() {
         return String.valueOf(getDistance());
     }
+
+    // Returns a boolean value, if a given Route has the same Hubs as this one
+    public boolean hasSameHubs(Route route) {
+        return this.containsHub(route.getHubOrigin()) && this.containsHub(route.getHubDestination());
+    }
 }

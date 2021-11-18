@@ -2,13 +2,24 @@ package com.brunomnsilva.smartgraph.model;
 
 public class Hub {
 
+    private String fullName;
     private String code;
     private String name;
     private int population;
     private double x;
     private double y;
 
+    public Hub() {
+        this.fullName = "";
+        this.code = "";
+        this.name = "";
+        this.population = -1;
+        this.x = -1;
+        this.y = -1;
+    }
+
     public Hub(String code, String name) {
+        this.fullName = name + ", " + code;
         this.code = code;
         this.name = name;
         this.population = -1;
@@ -29,6 +40,8 @@ public class Hub {
     public String toString() {
         return getIdentifier();
     }
+
+    public String getFullName() { return this.fullName;}
 
     public String getCode() {
         return this.code;
@@ -51,7 +64,7 @@ public class Hub {
     }
 
     public String getIdentifier() {
-        return getName() + ", " + getCode();
+        return getFullName();
     }
 
 }

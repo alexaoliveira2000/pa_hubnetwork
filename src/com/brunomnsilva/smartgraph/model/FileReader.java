@@ -1,5 +1,7 @@
 package com.brunomnsilva.smartgraph.model;
 
+import com.brunomnsilva.smartgraph.graph.Vertex;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -76,8 +78,8 @@ public class FileReader {
     }
 
     // Reads routes_*.txt file, creates new Routes, returns new list of Routes
-    public List<Route> readRoutes(List<Hub> hubs) throws NonEqualHubsException {
-        if (readFile(this.routes_file).size() != hubs.size()) throw new NonEqualHubsException();
+    public List<Route> readRoutes(List<Vertex<Hub>> vertices) throws NonEqualHubsException {
+        if (readFile(this.routes_file).size() != vertices.size()) throw new NonEqualHubsException();
         List<Route> routes = new ArrayList<>();
         int row_index = 0;
         int column_index = 0;
@@ -85,7 +87,7 @@ public class FileReader {
             column_index = 0;
             for (String value : row.split(" ")) {
                 if (row_index < column_index && Integer.valueOf(value) != 0)
-                    routes.add(new Route(hubs.get(row_index), hubs.get(column_index), Integer.valueOf(value)));
+                    routes.add(new Route(vertices.get(row_index).element(), vertices.get(column_index).element(), Integer.valueOf(value)));
                 column_index++;
             }
             row_index++;

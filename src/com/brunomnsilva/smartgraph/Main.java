@@ -44,7 +44,7 @@ public class Main extends Application {
     @Override
     public void start(Stage ignored) {
 
-        NetworkController controller = new NetworkController("dataset/sgb128", "routes_1.txt");
+        NetworkController controller = new NetworkController("dataset/sgb128", "routes_2.txt");
         controller.start();
 
         // ------------------------ OLD -------------------------------------------------------------

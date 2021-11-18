@@ -1109,6 +1109,28 @@ public class SmartGraphPanel<V, E> extends Pane {
     private void enableDoubleClickListener() {
         setOnMouseClicked((MouseEvent mouseEvent) -> {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+
+                // Adicionado
+                if (mouseEvent.getClickCount() == 1) {
+                    if (vertexClickConsumer == null && edgeClickConsumer == null) {
+                        return;
+                    }
+                    Node node = pick(SmartGraphPanel.this, mouseEvent.getSceneX(), mouseEvent.getSceneY());
+                    if (node == null) {
+                        return;
+                    }
+
+                    if (node instanceof SmartGraphVertex) {
+                        SmartGraphVertex v = (SmartGraphVertex) node;
+                        vertexClickConsumer.accept(v);
+                        }
+
+                    if (node instanceof SmartGraphEdge) {
+                        SmartGraphEdge e = (SmartGraphEdge) node;
+                        edgeClickConsumer.accept(e);
+                    }
+                }
+
                 if (mouseEvent.getClickCount() == 2) {
                     //no need to continue otherwise
                     if (vertexClickConsumer == null && edgeClickConsumer == null) {
