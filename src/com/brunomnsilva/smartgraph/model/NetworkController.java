@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkController {
@@ -102,6 +103,14 @@ public class NetworkController {
         addRemoveRouteButtonAction(stage, button_removeRoute);
         addSaveRoutesButtonAction(stage, button_saveRoutes);
         addImportRoutesAction(stage, button_importRoutes);
+
+        List<Vertex<Hub>> path = new ArrayList<>();
+        double cost = manager.minimumCostPath(manager.getVertex(graph,"Victoria, TX"),manager.getVertex(graph,"Williston, ND"),path,graph);
+        //System.out.println("Path : "+path);
+        //System.out.println("Cost : "+cost);
+
+        System.out.println("");
+
     }
 
     // Sets the vertices coordinates
