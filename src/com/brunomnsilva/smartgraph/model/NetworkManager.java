@@ -308,106 +308,22 @@ public class NetworkManager {
     }
 
     public Vertex<Hub> getVertex(Graph<Hub, Route> graph,String identifier){
-
         List<Vertex<Hub>> vertices = new ArrayList<>(graph.vertices());
-
-        for(Vertex<Hub> elem: vertices){
-
-            if(elem.element().getIdentifier().equals(identifier)){
-
+        for(Vertex<Hub> elem: vertices)
+            if(elem.element().getIdentifier().equals(identifier))
                 return elem;
-
-            }
-
-        }
         return null;
-
     }
 
-    //Vai toma
-    /*
-    * private static void dijkstra(Vertex<Local> orig,
-                      Map<Vertex<Local>, Double> costs,
-                      Map<Vertex<Local>, Vertex<Local>> predecessors, Graph<Local,Bridge> graph){
-
-    Set<Vertex<Local>> unvisited = new HashSet<>(graph.vertices());
-
-    for(Vertex<Local> v : unvisited)
-        costs.put(v,Double.MAX_VALUE);
-    costs.put(orig,0.0);
-    Vertex<Local> u;
-    while(!unvisited.isEmpty()){
-
-        u = findMinVertex(unvisited,costs);
-        if(costs.get(u)==Double.MAX_VALUE) return; //case there is no path
-        unvisited.remove(u); //mark as visited
-        for(Edge<Bridge,Local> e :graph.incidentEdges(u)){
-
-            Vertex v = graph.opposite(u,e); //adjacent vertex to u
-            double costV = e.element().getCost() + costs.get(u);
-            if(costV < costs.get(v)){ //I found a cheaper path, so Im going to replace the value
-
-                costs.put(v,costV);
-                predecessors.put(v,u);
-
-            }
-
-        }
-
-    }
-
-}
-
-private static Vertex<Local> findMinVertex(Set<Vertex<Local>> unvisited, Map<Vertex<Local>, Double> costs) {
-
-    Vertex<Local> vMin = null;
-    double minCost = Double.MAX_VALUE;
-
-    for(Vertex<Local> v :unvisited){
-
-        if(costs.get(v) < minCost)
-            vMin=v;
-            minCost=costs.get(v);
-
-    }
-
-    return vMin;
-
-}
-
-public static double minimumCostPath(Vertex<Local> orig, Vertex<Local> dst, List<Vertex<Local>> localsPath,Graph<Local,Bridge> graph){
-
-    Map<Vertex<Local>, Double> costs = new HashMap<>();
-    Map<Vertex<Local>, Vertex<Local>> predecessors = new HashMap<>();
-    dijkstra(orig,costs,predecessors,graph);
-    Vertex<Local>  v =dst;
-    while(v!=orig){
-
-        localsPath.add(0,v);
-        v = predecessors.get(v);
-    }
-    localsPath.add(0,v);
-    return costs.get(dst);
-
-}
-    *
-    * */
-    private Vertex<Hub> findMinVertex(Set<Vertex<Hub>> unvisited, Map<Vertex<Hub>, Double> costs) {
-
+    private Vertex<Hub> findMinVertex(Set<Vertex<Hub>> unvisited, Map<Vertex<Hub>,Double> costs) {
         Vertex<Hub> vMin = null;
         double minCost = Double.MAX_VALUE;
         System.out.println(minCost);
-        for (Vertex<Hub> v : unvisited) {
+        for (Vertex<Hub> v : unvisited)
             if (costs.get(v) < minCost){
                 vMin = v;
                 minCost = costs.get(v);
             }
-            System.out.println("Ult cust "+costs.get(v));
-
-        }
-        if(vMin == null){
-            System.out.println("Eita diacho");
-        }
         return vMin;
 
     }
@@ -433,29 +349,25 @@ public static double minimumCostPath(Vertex<Local> orig, Vertex<Local> dst, List
                                  Map<Vertex<Hub>, Double> costs,
                                  Map<Vertex<Hub>, Vertex<Hub>> predecessors, Graph<Hub,Route> graph){
 
-        Set<Vertex<Hub>> unvisited = new HashSet<>(graph.vertices());
-
+        List<Hub> hubs = depthFirstSearch(graph,orig.element());
+        Set<Vertex<Hub>> unvisited = new HashSet<>();
+        for (Hub hub : hubs)
+            unvisited.add(getVertex(graph,hub.getIdentifier()));
         for(Vertex<Hub> v : unvisited)
             costs.put(v,Double.MAX_VALUE);
         costs.put(orig,0.0);
         Vertex<Hub> u;
         while(!unvisited.isEmpty()){
-            System.out.println("PRINT 1 "+unvisited);
-            System.out.println("PRINT 2 "+costs);
             u = findMinVertex(unvisited,costs);
             if(costs.get(u)==Double.MAX_VALUE) return; //case there is no path
             unvisited.remove(u); //mark as visited
             for(Edge<Route,Hub> e :graph.incidentEdges(u)){
-
                 Vertex v = graph.opposite(u,e); //adjacent vertex to u
                 double costV = e.element().getDistance() + costs.get(u);
                 if(costV < costs.get(v)){ //I found a cheaper path, so Im going to replace the value
-
                     costs.put(v,costV);
                     predecessors.put(v,u);
-
                 }
-
             }
 
         }

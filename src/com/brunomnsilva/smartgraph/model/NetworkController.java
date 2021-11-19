@@ -106,8 +106,8 @@ public class NetworkController {
 
         List<Vertex<Hub>> path = new ArrayList<>();
         double cost = manager.minimumCostPath(manager.getVertex(graph,"Victoria, TX"),manager.getVertex(graph,"Williston, ND"),path,graph);
-        //System.out.println("Path : "+path);
-        //System.out.println("Cost : "+cost);
+        System.out.println("Path : "+path);
+        System.out.println("Cost : "+cost);
 
         System.out.println("");
 
